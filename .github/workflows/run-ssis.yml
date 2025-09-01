@@ -46,7 +46,7 @@ jobs:
         Write-Host "Paquete ejecutado. Log guardado en $logFile"
 
     - name: Subir log como artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dtsx-log
         path: dtsx-log.txt
