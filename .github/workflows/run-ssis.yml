@@ -4,7 +4,7 @@ on:
   # Permite ejecución manual vía GitHub
   workflow_dispatch:
     inputs:
-      package-name:
+      package_name:
         description: 'Nombre del paquete a ejecutar (sin extensión opcional)'
         required: false
         default: 'General'
@@ -24,7 +24,7 @@ jobs:
       shell: powershell
       run: |
         # Obtener el nombre del paquete
-        $package = "${{ github.event.inputs.package-name }}"
+        $package = "${{ github.event.inputs.package_name }}"
         if (-not $package) { $package = "General" }
 
         # Agregar la extensión .dtsx si no está
