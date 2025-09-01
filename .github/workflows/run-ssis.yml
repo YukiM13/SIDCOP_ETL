@@ -31,7 +31,7 @@ jobs:
         Write-Host "Ejecutando paquete: $package"
 
         # Ruta dentro del repo clonado
-        $packagePath = Join-Path $PWD "SIDCOP_ETL\SIDCOP_Backend.ETL\$package"
+        $packagePath = Join-Path $PWD "SIDCOP_Backend.ETL\$package"
 
         # Definir archivo de log
         $logFile = Join-Path $PWD "dtsx-log.txt"
