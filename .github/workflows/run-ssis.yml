@@ -1,14 +1,12 @@
 name: Ejecutar Paquete SSIS
 
 on:
-  # Permite ejecución manual vía GitHub
   workflow_dispatch:
     inputs:
       package_name:
         description: 'Nombre del paquete a ejecutar (sin extensión opcional)'
         required: false
         default: 'General'
-  # Permite ejecución automática diaria a las 2:00 AM UTC
   schedule:
     - cron: '0 2 * * *'  # 2:00 AM UTC todos los días
 
@@ -28,9 +26,7 @@ jobs:
         if (-not $package) { $package = "General" }
 
         # Agregar la extensión .dtsx si no está
-        if (-not $package.ToLower().EndsWith(".dtsx")) {
-            $package += ".dtsx"
-        }
+        if (-not $package.ToLower().EndsWith(".dtsx")) { $package += ".dtsx" }
 
         Write-Host "Ejecutando paquete: $package"
 
@@ -42,8 +38,17 @@ jobs:
 
         # Ejecutar paquete y guardar salida en log
         dtexec /F "$packagePath" > $logFile 2>&1
+        $exitCode = $LASTEXITCODE
 
-        Write-Host "Paquete ejecutado. Log guardado en $logFile"
+        # Mostrar log completo en consola
+        Get-Content $logFile | ForEach-Object { Write-Host $_ }
+
+        if ($exitCode -eq 0) {
+            Write-Host "✅ DTSX ejecutado correctamente."
+        } else {
+            Write-Error "❌ DTSX falló con código $exitCode."
+            exit $exitCode
+        }
 
     - name: Subir log como artifact
       uses: actions/upload-artifact@v4
