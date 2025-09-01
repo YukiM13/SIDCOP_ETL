@@ -37,7 +37,7 @@ jobs:
         $logFile = Join-Path $PWD "dtsx-log.txt"
 
         # Ejecutar paquete y guardar salida en log
-        dtexec /F "$packagePath" > $logFile 2>&1
+        dtexec /F "$packagePath" /De "admin123" > $logFile 2>&1
         $exitCode = $LASTEXITCODE
 
         # Mostrar log completo en consola
