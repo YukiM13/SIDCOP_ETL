@@ -1,0 +1,52 @@
+name: Ejecutar Paquete SSIS
+
+on:
+  # Permite ejecución manual vía GitHub
+  workflow_dispatch:
+    inputs:
+      package-name:
+        description: 'Nombre del paquete a ejecutar (sin extensión opcional)'
+        required: false
+        default: 'General'
+  # Permite ejecución automática diaria a las 2:00 AM UTC
+  schedule:
+    - cron: '0 2 * * *'  # 2:00 AM UTC todos los días
+
+jobs:
+  run-dtsx:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout del repositorio
+      uses: actions/checkout@v3
+
+    - name: Ejecutar paquete SSIS
+      shell: powershell
+      run: |
+        # Obtener el nombre del paquete
+        $package = "${{ github.event.inputs.package-name }}"
+        if (-not $package) { $package = "General" }
+
+        # Agregar la extensión .dtsx si no está
+        if (-not $package.ToLower().EndsWith(".dtsx")) {
+            $package += ".dtsx"
+        }
+
+        Write-Host "Ejecutando paquete: $package"
+
+        # Ruta dentro del repo clonado
+        $packagePath = Join-Path $PWD "SIDCOP_ETL\SIDCOP_Backend.ETL\$package"
+
+        # Definir archivo de log
+        $logFile = Join-Path $PWD "dtsx-log.txt"
+
+        # Ejecutar paquete y guardar salida en log
+        dtexec /F "$packagePath" > $logFile 2>&1
+
+        Write-Host "Paquete ejecutado. Log guardado en $logFile"
+
+    - name: Subir log como artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dtsx-log
+        path: dtsx-log.txt
